@@ -69,6 +69,30 @@ static void display_callback(void) {
 }
 
 /*
+ * Reshape callback: updates viewport and projection matrix when window is resized.
+ */
+static void reshape_callback(int width, int height) {
+    /* Prevent division by zero */
+    if (height <= 0) {
+        height = 1;
+    }
+    window_width = width;
+    window_height = height;
+
+    /* Set viewport to encompass the full window */
+    glViewport(0, 0, width, height);
+
+    /* Update projection matrix with appropriate aspect ratio */
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, (double)width / (double)height, 0.1, 100.0);
+
+    /* Return to modelview matrix */
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
+/*
  * Keyboard callback: handles user key presses for clean exit.
  */
 static void keyboard_callback(unsigned char key, int x, int y) {
@@ -105,6 +129,7 @@ int main(int argc, char** argv) {
 
     /* 4. Register callbacks */
     glutDisplayFunc(display_callback);
+    glutReshapeFunc(reshape_callback);
     glutKeyboardFunc(keyboard_callback);
 
     /* Allow clean return from main loop on window close */
