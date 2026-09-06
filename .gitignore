@@ -1,0 +1,52 @@
+# ====================================================================
+# Git Ignore for C / OpenGL / FreeGLUT Windows Project (fuzzy-potato)
+# ====================================================================
+
+# Build output directories
+bin/
+build/
+out/
+dist/
+
+# Compiled executables and shared libraries
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Compiled object files and static libraries
+*.o
+*.obj
+*.a
+*.lib
+
+# Debug symbols and linker state
+*.pdb
+*.ilk
+*.idb
+*.exp
+
+# IDE and Editor settings
+.vscode/
+.vs/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Build system caches and temporary outputs
+CMakeCache.txt
+CMakeFiles/
+cmake-build-*/
+Makefile.bak
+
+# Operating System temporary files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# General logs and temporary files
+*.log
+*.tmp
+*.temp
+*.bak
