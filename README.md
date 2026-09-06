@@ -4,13 +4,6 @@ An interactive, real-time 3D simulation of the Solar System and space exploratio
 
 ---
 
-## Team
-
-* **Krithika**
-* **Akshatha**
-
----
-
 ## Technology Stack
 
 * **Language**: C (C99 standard)
