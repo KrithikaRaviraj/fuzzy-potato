@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/freeglut.h>
+#include "camera.h"
 
 /* Window dimensions */
 static int window_width = 800;
@@ -45,13 +46,7 @@ static void display_callback(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     /* Set up Modelview matrix */
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    /* Position camera: eye(0, 2, 5), center(0, 0, 0), up(0, 1, 0) */
-    gluLookAt(0.0, 2.0, 5.0,
-              0.0, 0.0, 0.0,
-              0.0, 1.0, 0.0);
+   camera_apply();
 
     /* Apply a slight tilt to demonstrate 3D depth and perspective */
     glPushMatrix();
@@ -103,6 +98,8 @@ static void keyboard_callback(unsigned char key, int x, int y) {
         printf("[SolarSim] Clean exit requested by user.\n");
         glutLeaveMainLoop();
     }
+    camera_keyboard(key);
+glutPostRedisplay();
 }
 
 /*
@@ -126,6 +123,8 @@ int main(int argc, char** argv) {
 
     /* 3. Initialize OpenGL 3D settings (depth test, projection, clear color) */
     init_opengl();
+    camera_init();
+
 
     /* 4. Register callbacks */
     glutDisplayFunc(display_callback);
