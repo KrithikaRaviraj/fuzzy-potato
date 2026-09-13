@@ -2,6 +2,7 @@
 REM ====================================================================
 REM Interactive 3D Solar System and Space Exploration Simulator
 REM Build script for Windows using GCC (MSYS2 UCRT64)
+REM Week 2: 3D Scene and First Objects
 REM ====================================================================
 
 setlocal
@@ -13,8 +14,8 @@ if not exist bin (
     mkdir bin
 )
 
-echo [BUILD] Compiling 3D Solar System Simulator (Week 1 Foundation)...
-gcc -Wall -Wextra -std=c99 src\main.c src\camera.c -Iinclude -o bin\solar_sim.exe -lfreeglut -lopengl32 -lglu32
+echo [BUILD] Compiling 3D Solar System Simulator (Week 2: 3D Scene and Sun)...
+gcc -Wall -Wextra -std=c99 src\main.c src\camera.c src\sphere.c src\lighting.c src\sun.c -Iinclude -o bin\solar_sim.exe -lfreeglut -lopengl32 -lglu32
 
 if %ERRORLEVEL% equ 0 (
     echo [BUILD] Build successful! Binary: bin\solar_sim.exe

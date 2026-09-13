@@ -1,34 +1,59 @@
 /*
  * Interactive 3D Solar System and Space Exploration Simulator
- * Week 1: Setup & OpenGL Foundation
+ * Week 2: 3D Scene & First Objects
  * Team: Krithika & Akshatha
  * Developer: Krithika
  *
  * File: src/main.c
- * Description: Initial OpenGL and FreeGLUT window creation and basic rendering.
+ * Description: 3D Scene setup, perspective projection, lighting, and integration
+ *              with Akshatha's camera and Krithika's Sun/sphere rendering.
+ *
+ * 3D Coordinate System Convention (Standard OpenGL Right-Handed):
+ *   +X axis : Extends to the right
+ *   -X axis : Extends to the left
+ *   +Y axis : Extends upwards
+ *   -Y axis : Extends downwards
+ *   +Z axis : Extends out of the screen (toward the viewer)
+ *   -Z axis : Extends into the screen (away from the viewer)
+ *   Origin (0, 0, 0) : Center of the Solar System (Sun's location)
+ *
+ * Graphics Transformation Pipeline:
+ *   1. Model Transformation : sun_render() translates and positions objects in world space.
+ *   2. View Transformation  : camera_apply() via gluLookAt() aligns eye/camera space.
+ *   3. Projection           : gluPerspective() converts eye space to clip coordinates.
+ *   4. Viewport Mapping     : glViewport() maps normalized coordinates to window pixels.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/freeglut.h>
 #include "camera.h"
+#include "sphere.h"
+#include "lighting.h"
+#include "sun.h"
 
 /* Window dimensions */
 static int window_width = 800;
 static int window_height = 600;
 
 /*
- * Initialize OpenGL state for 3D rendering.
+ * Initialize OpenGL state for 3D rendering and lighting.
  */
 static void init_opengl(void) {
     /* Set background clear color (deep space darkness) */
-    glClearColor(0.05f, 0.05f, 0.1f, 1.0f);
+    glClearColor(0.02f, 0.02f, 0.05f, 1.0f);
 
-    /* Enable depth testing for 3D rendering */
+    /* Enable depth testing to properly resolve 3D spatial occlusion */
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    /* Configure initial projection matrix */
+    /* Initialize fixed-function lighting foundation */
+    lighting_init();
+
+    /* Initialize Sun properties */
+    sun_init();
+
+    /* Configure initial perspective projection matrix */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45.0, (double)window_width / (double)window_height, 0.1, 100.0);
@@ -39,32 +64,36 @@ static void init_opengl(void) {
 }
 
 /*
- * Display callback: clears buffers, sets camera, and renders a 3D test primitive.
+ * Display callback: clears buffers, applies camera, positions light, and renders the 3D scene.
  */
 static void display_callback(void) {
     /* Clear color and depth buffers */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    /* Set up Modelview matrix */
-   camera_apply();
+    /*
+     * 1. View Transformation:
+     * Apply camera orientation and position using gluLookAt().
+     */
+    camera_apply();
 
-    /* Apply a slight tilt to demonstrate 3D depth and perspective */
-    glPushMatrix();
-    glRotatef(20.0f, 1.0f, 0.0f, 0.0f);
-    glRotatef(30.0f, 0.0f, 1.0f, 0.0f);
+    /*
+     * 2. Light Source Positioning:
+     * Position GL_LIGHT0 in world coordinates at (0, 0, 0) matching the Sun.
+     */
+    lighting_apply();
 
-    /* Render a simple 3D wireframe sphere to establish 3D geometry foundation */
-    glColor3f(0.2f, 0.7f, 1.0f);
-    glutWireSphere(1.2, 24, 16);
-
-    glPopMatrix();
+    /*
+     * 3. Model Transformation & Rendering:
+     * Render the Sun at the center of the Solar System.
+     */
+    sun_render();
 
     /* Swap front and back buffers */
     glutSwapBuffers();
 }
 
 /*
- * Reshape callback: updates viewport and projection matrix when window is resized.
+ * Reshape callback: updates viewport and perspective projection when window is resized.
  */
 static void reshape_callback(int width, int height) {
     /* Prevent division by zero */
@@ -88,18 +117,25 @@ static void reshape_callback(int width, int height) {
 }
 
 /*
- * Keyboard callback: handles user key presses for clean exit.
+ * Keyboard callback: handles user key presses for navigation and exit.
  */
 static void keyboard_callback(unsigned char key, int x, int y) {
     (void)x;
     (void)y;
+
     /* Exit cleanly on ESC (key code 27) or 'q' / 'Q' */
     if (key == 27 || key == 'q' || key == 'Q') {
         printf("[SolarSim] Clean exit requested by user.\n");
+        fflush(stdout);
         glutLeaveMainLoop();
+        return;
     }
+
+    /* Forward navigation keys to Akshatha's camera system */
     camera_keyboard(key);
-glutPostRedisplay();
+
+    /* Request a redraw after camera state changes */
+    glutPostRedisplay();
 }
 
 /*
@@ -108,25 +144,25 @@ glutPostRedisplay();
 int main(int argc, char** argv) {
     printf("====================================================\n");
     printf(" 3D Solar System & Space Exploration Simulator\n");
-    printf(" Week 1: OpenGL & FreeGLUT Foundation\n");
+    printf(" Week 2: 3D Scene & First Objects\n");
     printf(" Team: Krithika & Akshatha\n");
+    printf(" Developer: Krithika\n");
     printf("====================================================\n");
 
-    /* 1. Initialise FreeGLUT */
+    /* 1. Initialize FreeGLUT */
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(window_width, window_height);
     glutInitWindowPosition(100, 100);
 
     /* 2. Create window */
-    glutCreateWindow("Solar System Simulator - Week 1 Foundation");
+    glutCreateWindow("Solar System Simulator - Week 2: 3D Scene & Sun");
 
-    /* 3. Initialize OpenGL 3D settings (depth test, projection, clear color) */
+    /* 3. Initialize OpenGL 3D settings and lighting */
     init_opengl();
     camera_init();
 
-
-    /* 4. Register callbacks */
+    /* 4. Register FreeGLUT callbacks */
     glutDisplayFunc(display_callback);
     glutReshapeFunc(reshape_callback);
     glutKeyboardFunc(keyboard_callback);
@@ -134,11 +170,17 @@ int main(int argc, char** argv) {
     /* Allow clean return from main loop on window close */
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
-    printf("[SolarSim] Window created. Press ESC or 'q' to exit.\n");
+    printf("[SolarSim] Window created successfully.\n");
+    printf("[Controls] W/S: Move Forward / Backward\n");
+    printf("[Controls] A/D: Move Left / Right\n");
+    printf("[Controls] R:   Reset Camera Position\n");
+    printf("[Controls] ESC / Q: Exit Application\n");
+    fflush(stdout);
 
     /* 5. Enter FreeGLUT event loop */
     glutMainLoop();
 
     printf("[SolarSim] Application terminated cleanly.\n");
+    fflush(stdout);
     return EXIT_SUCCESS;
 }
