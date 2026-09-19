@@ -13,6 +13,7 @@ static float camera_z = 28.0f;
 
 /* Camera movement speed scaled for solar system dimensions */
 static const float CAMERA_SPEED = 0.5f;
+static const float VIEW_DISTANCE_STEP = 1.0f;
 
 /* Initialize camera */
 void camera_init(void)
@@ -26,7 +27,17 @@ void camera_init(void)
 void camera_keyboard(unsigned char key)
 {
     switch (key)
+
     {
+                case 'z':
+        case 'Z':
+            camera_z -= VIEW_DISTANCE_STEP;
+            break;
+
+        case 'x':
+        case 'X':
+            camera_z += VIEW_DISTANCE_STEP;
+            break;
         case 'w':
         case 'W':
             camera_z -= CAMERA_SPEED;
