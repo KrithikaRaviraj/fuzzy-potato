@@ -1,12 +1,12 @@
 # Interactive 3D Solar System and Space Exploration Simulator
 # Makefile for GCC (MSYS2 UCRT64 / MinGW-w64)
-# Week 2: 3D Scene & First Objects
+# Week 3: Complete Basic Solar System
 
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -Iinclude
 LDFLAGS = -lfreeglut -lopengl32 -lglu32
 
-SRC = src/main.c src/camera.c src/sphere.c src/lighting.c src/sun.c
+SRC = src/main.c src/camera.c src/sphere.c src/lighting.c src/sun.c src/planet.c src/orbit.c
 TARGET = bin/solar_sim.exe
 
 all: $(TARGET)
