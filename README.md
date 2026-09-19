@@ -6,7 +6,7 @@ An interactive, real-time 3D simulation of the Solar System and space exploratio
 
 ## Current Status
 
-**Week 3 — Complete Basic Solar System**
+**Week 3 - Complete Basic Solar System**
 
 The project has transitioned from the central Sun foundation to the complete basic Solar System scene:
 * **All 8 Planets**: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune rendered as solid 3D spheres.
@@ -107,10 +107,3 @@ fuzzy-potato/
    ```cmd
    run.bat
    ```
-
-### Option 2: Using GNU Make
-
-```bash
-make
-make run
-```
