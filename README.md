@@ -6,15 +6,16 @@ An interactive, real-time 3D simulation of the Solar System and space exploratio
 
 ## Current Status
 
-**Week 2 — 3D Scene & First Objects**
+**Week 3 — Complete Basic Solar System**
 
-The project has transitioned from initial setup to establishing the core 3D scene foundation:
-* **3D Coordinate System**: Consistent right-handed Cartesian coordinate system with origin at the Solar System center.
-* **Perspective Projection**: Dynamic perspective projection responding smoothly to window resizing.
-* **Reusable Sphere Renderer**: Generic sphere drawing module (`sphere.h` / `sphere.c`) generating outward-facing vertex normals.
-* **Sun (Central Object)**: Central 3D sphere rendered at `(0, 0, 0)` with isolated model transformations and self-luminous emission.
-* **Basic Lighting**: Fixed-function OpenGL lighting setup (`GL_LIGHT0`, `GL_NORMALIZE`, ambient and diffuse components).
-* **Camera Integration**: Seamless integration with Akshatha's Week 1 camera navigation system.
+The project has transitioned from the central Sun foundation to the complete basic Solar System scene:
+* **All 8 Planets**: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune rendered as solid 3D spheres.
+* **Planetary Orbits**: Eight circular orbit paths rendered on the horizontal X-Z plane (`y = 0`) using smooth parametric line loops.
+* **Relative Scale & Spacing**: Normalized educational visualization scale preserving relative planetary size relationships and strictly increasing orbital distances outward from the Sun.
+* **Distinct Colors**: Clearly distinguishable, physically inspired base colors for every celestial body.
+* **Saturn's Ring**: Clean geometric representation of Saturn's tilted planetary ring system using basic OpenGL geometry.
+* **Point-Light Illumination**: Fixed-function OpenGL point light (`GL_LIGHT0`) positioned at the Sun's center, producing realistic day/night hemispherical illumination on planets.
+* **Camera & Viewport**: Elevated oblique perspective view `(0.0, 16.0, 28.0)` providing an immediate, unclipped overview of all 8 planets and their orbital paths.
 
 ---
 
@@ -34,11 +35,12 @@ The project employs the standard **OpenGL Right-Handed Cartesian Coordinate Syst
 
 * **+X axis**: Extends to the right
 * **-X axis**: Extends to the left
-* **+Y axis**: Extends upwards
+* **+Y axis**: Extends upwards (perpendicular to the orbital plane)
 * **-Y axis**: Extends downwards
 * **+Z axis**: Extends out of the screen (toward the viewer)
 * **-Z axis**: Extends into the screen (away from the viewer)
 * **Origin `(0, 0, 0)`**: Center of the Solar System, where the Sun resides.
+* **Orbital Plane**: The ecliptic horizontal plane ($Y = 0$, X-Z plane).
 
 ---
 
@@ -52,16 +54,21 @@ fuzzy-potato/
 │   ├── camera.c        # Camera navigation and view matrix management
 │   ├── sphere.c        # Reusable 3D sphere rendering abstraction with normals
 │   ├── lighting.c      # Fixed-function OpenGL lighting initialization and positioning
-│   └── sun.c           # Central Sun 3D object rendering and material properties
+│   ├── sun.c           # Central Sun 3D object rendering and material properties
+│   ├── planet.c        # Reusable 8-planet data structure, rendering, and Saturn ring
+│   └── orbit.c         # Circular parametric orbit line rendering on X-Z plane
 ├── include/
 │   ├── camera.h        # Camera interface
 │   ├── sphere.h        # Reusable sphere renderer interface
 │   ├── lighting.h      # Lighting subsystem interface
-│   └── sun.h           # Sun subsystem interface
+│   ├── sun.h           # Sun subsystem interface
+│   ├── planet.h        # Planet subsystem interface and data structures
+│   └── orbit.h         # Orbit subsystem interface
 ├── textures/           # Surface textures and skybox maps (reserved for future weeks)
 ├── assets/             # 3D object models and simulation assets (reserved for future weeks)
 ├── docs/               # Technical guides and Computer Graphics concepts documentation
-│   ├── week2_concepts.md # Detailed CG concepts: transformations, lighting, projection
+│   ├── week3_concepts.md # Comprehensive CG guide: hierarchical modeling, orbits, lighting
+│   ├── week2_concepts.md # Week 2 concepts: coordinate systems, transformations, projection
 │   ├── compiler_setup.md # MSYS2 GCC UCRT64 environment guide
 │   ├── opengl_setup.md   # OpenGL configuration guide
 │   └── freeglut_setup.md # FreeGLUT configuration guide
@@ -79,11 +86,11 @@ fuzzy-potato/
 
 | Key | Action |
 |---|---|
-| `W` / `w` | Move Camera Forward (+Z) |
-| `S` / `s` | Move Camera Backward (-Z) |
+| `W` / `w` | Move Camera Forward (-Z) |
+| `S` / `s` | Move Camera Backward (+Z) |
 | `A` / `a` | Move Camera Left (-X) |
 | `D` / `d` | Move Camera Right (+X) |
-| `R` / `r` | Reset Camera to Default Position `(0, 2, 5)` |
+| `R` / `r` | Reset Camera to Default Overview `(0, 16, 28)` |
 | `ESC` / `Q` / `q` | Exit Simulator Cleanly |
 
 ---
