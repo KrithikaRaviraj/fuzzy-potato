@@ -130,3 +130,4 @@ $$\text{Mercury (2.5)} < \text{Venus (3.6)} < \text{Earth (4.8)} < \text{Mars (6
 - **Look-At Target**: `(0.0, 0.0, 0.0)`
 - **Up Vector**: `(0.0, 1.0, 0.0)`
 - This vantage point looks down obliquely at an angle of $\approx 29.7^\circ$ from the horizontal plane, transforming the circular orbits into clear ellipses and capturing the Sun and all 8 planets within the viewing frustum on launch.
+

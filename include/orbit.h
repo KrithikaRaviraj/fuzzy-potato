@@ -23,3 +23,4 @@ void orbit_draw(float distance);
 void orbits_render_all(void);
 
 #endif /* ORBIT_H */
+
