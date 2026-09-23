@@ -1,17 +1,17 @@
 /*
  * Interactive 3D Solar System and Space Exploration Simulator
- * Week 3: Complete Basic Solar System
+ * Week 4: Rotation, Revolution & Moon
  * Team: Krithika & Akshatha
  * Developer: Krithika
  *
  * File: src/main.c
- * Description: 3D Scene setup, perspective projection, lighting, and integration
- *              with camera, central Sun, planetary orbits, and all 8 planets.
+ * Description: 3D Scene setup, perspective projection, lighting, camera integration,
+ *              and time-based dynamic animation loop (rotation, revolution, Moon).
  *
  * 3D Coordinate System Convention (Standard OpenGL Right-Handed):
  *   +X axis : Extends to the right
  *   -X axis : Extends to the left
- *   +Y axis : Extends upwards
+ *   +Y axis : Extends upwards (perpendicular to the orbital plane)
  *   -Y axis : Extends downwards
  *   +Z axis : Extends out of the screen (toward the viewer)
  *   -Z axis : Extends into the screen (away from the viewer)
@@ -22,7 +22,8 @@
  *   2. Light Positioning    : lighting_apply() fixes GL_LIGHT0 at world origin (0, 0, 0).
  *   3. Solar Body Rendering : sun_render() translates and renders the central Sun.
  *   4. Orbit Paths          : orbits_render_all() draws circular line loops on X-Z plane.
- *   5. Planetary System     : planets_render() hierarchically positions and draws 8 planets.
+ *   5. Dynamic Planets      : planets_render() hierarchically updates and draws 8 planets
+ *                             and the Earth-Moon child system.
  *   6. Projection           : gluPerspective() converts eye space to clip coordinates.
  *   7. Viewport Mapping     : glViewport() maps normalized coordinates to window pixels.
  */
@@ -41,6 +42,42 @@
 static int window_width = 1024;
 static int window_height = 768;
 
+/* Previous timestamp for elapsed delta-time calculation (milliseconds) */
+static int previous_time = 0;
+
+/*
+ * Timer callback: computes elapsed delta time and drives planetary animation.
+ */
+static void timer_callback(int value) {
+    (void)value;
+
+    int current_time = glutGet(GLUT_ELAPSED_TIME);
+
+    /* Safe first-frame initialization to prevent abnormal delta jumps */
+    if (previous_time == 0) {
+        previous_time = current_time;
+    }
+
+    float delta_time = (float)(current_time - previous_time) / 1000.0f;
+    previous_time = current_time;
+
+    /* Clamp delta_time to 0.1s maximum to prevent large jumps after pauses or window moves */
+    if (delta_time > 0.1f) {
+        delta_time = 0.1f;
+    } else if (delta_time < 0.0f) {
+        delta_time = 0.0f;
+    }
+
+    /* Update dynamic planetary rotation and revolution angles */
+    planets_update(delta_time);
+
+    /* Request screen redraw */
+    glutPostRedisplay();
+
+    /* Re-register timer for ~60 FPS (16 ms) */
+    glutTimerFunc(16, timer_callback, 0);
+}
+
 /*
  * Initialize OpenGL state for 3D rendering and lighting.
  */
@@ -55,7 +92,7 @@ static void init_opengl(void) {
     /* Initialize fixed-function lighting foundation */
     lighting_init();
 
-    /* Initialize celestial bodies */
+    /* Initialize celestial bodies and starting angles */
     sun_init();
     planets_init();
 
@@ -99,7 +136,7 @@ static void display_callback(void) {
     orbits_render_all();
 
     /*
-     * 5. Render all 8 planets with proper scaling, materials, and positions.
+     * 5. Render all 8 planets and Earth-Moon hierarchy at their dynamic positions.
      */
     planets_render();
 
@@ -146,7 +183,7 @@ static void keyboard_callback(unsigned char key, int x, int y) {
         return;
     }
 
-    /* Forward navigation keys to Akshatha's camera system */
+    /* Forward navigation keys to Akshatha's camera system (W/S/A/D, Z/X, R) */
     camera_keyboard(key);
 
     /* Request a redraw after camera state changes */
@@ -159,7 +196,7 @@ static void keyboard_callback(unsigned char key, int x, int y) {
 int main(int argc, char** argv) {
     printf("====================================================\n");
     printf(" 3D Solar System & Space Exploration Simulator\n");
-    printf(" Week 3: Complete Basic Solar System\n");
+    printf(" Week 4: Rotation, Revolution & Moon\n");
     printf(" Team: Krithika & Akshatha\n");
     printf(" Developer: Krithika\n");
     printf("====================================================\n");
@@ -171,7 +208,7 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(50, 50);
 
     /* 2. Create window */
-    glutCreateWindow("Solar System Simulator - Week 3: Complete Basic Solar System");
+    glutCreateWindow("Solar System Simulator - Week 4: Rotation, Revolution & Moon");
 
     /* 3. Initialize OpenGL 3D settings and lighting */
     init_opengl();
@@ -182,13 +219,18 @@ int main(int argc, char** argv) {
     glutReshapeFunc(reshape_callback);
     glutKeyboardFunc(keyboard_callback);
 
+    /* Initialize timer for animation */
+    previous_time = glutGet(GLUT_ELAPSED_TIME);
+    glutTimerFunc(16, timer_callback, 0);
+
     /* Allow clean return from main loop on window close */
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
     printf("[SolarSim] Window created successfully.\n");
-    printf("[SolarSim] Loaded %d planets: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune.\n", planets_get_count());
+    printf("[SolarSim] Loaded %d planets + Earth Moon system.\n", planets_get_count());
     printf("[Controls] W/S: Move Forward / Backward\n");
     printf("[Controls] A/D: Move Left / Right\n");
+    printf("[Controls] Z/X: Zoom In / Out (Viewing Distance)\n");
     printf("[Controls] R:   Reset Camera Position\n");
     printf("[Controls] ESC / Q: Exit Application\n");
     fflush(stdout);
