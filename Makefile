@@ -1,6 +1,6 @@
 # Interactive 3D Solar System and Space Exploration Simulator
 # Makefile for GCC (MSYS2 UCRT64 / MinGW-w64)
-# Week 3: Complete Basic Solar System
+# Week 4: Rotation, Revolution and Moon
 
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -Iinclude
