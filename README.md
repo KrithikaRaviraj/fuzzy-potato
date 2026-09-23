@@ -6,7 +6,7 @@ An interactive, real-time 3D simulation of the Solar System and space exploratio
 
 ## Current Status
 
-**Week 4 — Rotation, Revolution & Moon**
+**Week 4 - Rotation, Revolution & Moon**
 
 The project has introduced dynamic kinematics, orbital revolution, axial spin, and multi-level hierarchical satellite modeling:
 * **Planetary Orbital Revolution**: Continuous orbital revolution of all 8 planets around the Sun along their circular coplanar orbits ($Y = 0$). Revolution speeds follow Keplerian-inspired pedagogical scaling (Mercury fastest at $48^\circ/\text{s}$ down to Neptune at $3.5^\circ/\text{s}$).
@@ -110,15 +110,4 @@ fuzzy-potato/
 2. **Run**:
    ```cmd
    run.bat
-   ```
-
-### Option 2: Using GNU Make (MSYS2 / MinGW)
-
-1. **Build**:
-   ```bash
-   make
-   ```
-2. **Run**:
-   ```bash
-   make run
    ```
