@@ -6,16 +6,17 @@ An interactive, real-time 3D simulation of the Solar System and space exploratio
 
 ## Current Status
 
-**Week 3 - Complete Basic Solar System**
+**Week 4 — Rotation, Revolution & Moon**
 
-The project has transitioned from the central Sun foundation to the complete basic Solar System scene:
-* **All 8 Planets**: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune rendered as solid 3D spheres.
-* **Planetary Orbits**: Eight circular orbit paths rendered on the horizontal X-Z plane (`y = 0`) using smooth parametric line loops.
-* **Relative Scale & Spacing**: Normalized educational visualization scale preserving relative planetary size relationships and strictly increasing orbital distances outward from the Sun.
-* **Distinct Colors**: Clearly distinguishable, physically inspired base colors for every celestial body.
-* **Saturn's Ring**: Clean geometric representation of Saturn's tilted planetary ring system using basic OpenGL geometry.
-* **Point-Light Illumination**: Fixed-function OpenGL point light (`GL_LIGHT0`) positioned at the Sun's center, producing realistic day/night hemispherical illumination on planets.
-* **Camera & Viewport**: Elevated oblique perspective view `(0.0, 16.0, 28.0)` providing an immediate, unclipped overview of all 8 planets and their orbital paths.
+The project has introduced dynamic kinematics, orbital revolution, axial spin, and multi-level hierarchical satellite modeling:
+* **Planetary Orbital Revolution**: Continuous orbital revolution of all 8 planets around the Sun along their circular coplanar orbits ($Y = 0$). Revolution speeds follow Keplerian-inspired pedagogical scaling (Mercury fastest at $48^\circ/\text{s}$ down to Neptune at $3.5^\circ/\text{s}$).
+* **Planetary Axial Rotation**: Continuous axial spinning of every planet around its own local polar axis.
+* **Earth-Moon Hierarchical Modeling**: The Moon is modeled as a child satellite in a multi-level transformation hierarchy (`Sun -> Earth Orbit -> Earth Translation -> Moon Orbit -> Moon Translation -> Moon Spin`).
+* **Transformation Matrix Isolation**: Earth's axial rotation is isolated with `glPushMatrix` / `glPopMatrix` so that Earth's fast daily spin does not rotate the Moon's orbital plane.
+* **Frame-Rate Independent Animation**: Time-driven animation utilizing FreeGLUT's `glutTimerFunc` (~60 FPS) and wall-clock delta-time calculation (`glutGet(GLUT_ELAPSED_TIME)`), with safe first-frame initialization and stall clamping (max 0.1s).
+* **Angle Normalization**: All planetary and lunar orbital/rotational angles wrap safely within $[0^\circ, 360^\circ)$ to prevent floating-point precision degradation.
+* **Preserved Week 3 Starting Positions**: Planets start from their Week 3 reference positions, seamlessly animating onward.
+* **Dynamic Lighting & Day/Night Cycles**: The central point light (`GL_LIGHT0`) illuminates the inward-facing hemisphere of each revolving planet, producing dynamic day/night cycles and natural lunar phases.
 
 ---
 
@@ -50,24 +51,25 @@ The project employs the standard **OpenGL Right-Handed Cartesian Coordinate Syst
 fuzzy-potato/
 │
 ├── src/
-│   ├── main.c          # Application entry point and FreeGLUT event loop
+│   ├── main.c          # Application entry point, FreeGLUT timer and event loop
 │   ├── camera.c        # Camera navigation and view matrix management
 │   ├── sphere.c        # Reusable 3D sphere rendering abstraction with normals
 │   ├── lighting.c      # Fixed-function OpenGL lighting initialization and positioning
 │   ├── sun.c           # Central Sun 3D object rendering and material properties
-│   ├── planet.c        # Reusable 8-planet data structure, rendering, and Saturn ring
+│   ├── planet.c        # Dynamic 8-planet data structure, Moon hierarchy, and Saturn ring
 │   └── orbit.c         # Circular parametric orbit line rendering on X-Z plane
 ├── include/
 │   ├── camera.h        # Camera interface
 │   ├── sphere.h        # Reusable sphere renderer interface
 │   ├── lighting.h      # Lighting subsystem interface
 │   ├── sun.h           # Sun subsystem interface
-│   ├── planet.h        # Planet subsystem interface and data structures
+│   ├── planet.h        # Planet subsystem interface, animation update, and Moon accessors
 │   └── orbit.h         # Orbit subsystem interface
 ├── textures/           # Surface textures and skybox maps (reserved for future weeks)
 ├── assets/             # 3D object models and simulation assets (reserved for future weeks)
 ├── docs/               # Technical guides and Computer Graphics concepts documentation
-│   ├── week3_concepts.md # Comprehensive CG guide: hierarchical modeling, orbits, lighting
+│   ├── week4_concepts.md # Comprehensive guide: delta time, kinematics, Moon hierarchy
+│   ├── week3_concepts.md # Week 3 guide: hierarchical modeling, orbits, lighting
 │   ├── week2_concepts.md # Week 2 concepts: coordinate systems, transformations, projection
 │   ├── compiler_setup.md # MSYS2 GCC UCRT64 environment guide
 │   ├── opengl_setup.md   # OpenGL configuration guide
@@ -90,6 +92,8 @@ fuzzy-potato/
 | `S` / `s` | Move Camera Backward (+Z) |
 | `A` / `a` | Move Camera Left (-X) |
 | `D` / `d` | Move Camera Right (+X) |
+| `Z` / `z` | Zoom In / Decrease Viewing Distance |
+| `X` / `x` | Zoom Out / Increase Viewing Distance |
 | `R` / `r` | Reset Camera to Default Overview `(0, 16, 28)` |
 | `ESC` / `Q` / `q` | Exit Simulator Cleanly |
 
@@ -106,4 +110,15 @@ fuzzy-potato/
 2. **Run**:
    ```cmd
    run.bat
+   ```
+
+### Option 2: Using GNU Make (MSYS2 / MinGW)
+
+1. **Build**:
+   ```bash
+   make
+   ```
+2. **Run**:
+   ```bash
+   make run
    ```
