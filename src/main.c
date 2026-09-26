@@ -231,6 +231,8 @@ int main(int argc, char** argv) {
     printf("[Controls] W/S: Move Forward / Backward\n");
     printf("[Controls] A/D: Move Left / Right\n");
     printf("[Controls] Z/X: Zoom In / Out (Viewing Distance)\n");
+    printf("[Controls] 1-8: Focus on Mercury to Neptune\n");
+    printf("[Controls] 0:   Clear Planet Focus\n"); 
     printf("[Controls] R:   Reset Camera Position\n");
     printf("[Controls] ESC / Q: Exit Application\n");
     fflush(stdout);

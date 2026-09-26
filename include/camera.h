@@ -13,4 +13,9 @@ void camera_apply(void);
 /* Reset camera to its starting position */
 void camera_reset(void);
 
+/* Focus camera on a selected planet */
+void camera_focus_planet(int index);
+
+/* Return camera to the full Solar System view */
+void camera_clear_focus(void);
 #endif

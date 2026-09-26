@@ -203,8 +203,33 @@ float moon_get_rotation_angle(void) {
     return moon_rotation_angle;
 }
 
-float moon_get_rotation_speed(void) {
+float moon_get_rotation_speed(void)
+{
     return moon_rotation_speed;
+}
+
+void planet_get_position(int index, float *x, float *y, float *z)
+{
+    if (x == NULL || y == NULL || z == NULL)
+    {
+        return;
+    }
+
+    if (index < 0 || index >= PLANET_COUNT)
+    {
+        *x = 0.0f;
+        *y = 0.0f;
+        *z = 0.0f;
+        return;
+    }
+
+    const Planet *p = &planets[index];
+
+    float angle_rad = p->orbit_angle * (PI_CONST / 180.0f);
+
+    *x = p->orbit_distance * cosf(angle_rad);
+    *y = 0.0f;
+    *z = -p->orbit_distance * sinf(angle_rad);
 }
 
 void planets_render(void) {

@@ -69,4 +69,5 @@ float moon_get_orbit_speed(void);
 float moon_get_rotation_angle(void);
 float moon_get_rotation_speed(void);
 
+void planet_get_position(int index, float *x, float *y, float *z);
 #endif /* PLANET_H */
