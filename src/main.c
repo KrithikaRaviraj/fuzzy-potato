@@ -58,15 +58,19 @@ static void render_stars_background(void) {
 
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_CULL_FACE);
+
     texture_bind(stars_tex);
-    glColor3f(0.55f, 0.55f, 0.55f); /* Soft starry luminance */
+    glColor3f(0.85f, 0.85f, 0.85f); /* Subtle, natural cosmic starry luminance */
 
     glPushMatrix();
     glRotatef(20.0f, 1.0f, 0.0f, 0.5f);
-    sphere_draw(-70.0f, 32, 24); /* Negative radius draws inward-facing sphere */
+    sphere_draw(70.0f, 32, 24); /* Enclosing celestial background sphere */
     glPopMatrix();
 
     texture_unbind();
+    glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
 }

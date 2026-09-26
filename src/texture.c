@@ -167,3 +167,4 @@ GLuint texture_get_moon(void) {
 GLuint texture_get_stars(void) {
     return stars_texture;
 }
+

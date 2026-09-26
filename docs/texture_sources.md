@@ -39,3 +39,4 @@ All planetary and celestial surface textures used in this simulator are sourced 
 1. **Power-of-Two Dimensions**: All spherical maps are standard $2048 \times 1024$ ($2^{11} \times 2^{10}$), providing optimal compatibility with OpenGL texture hardware and automatic GLU mipmap generation.
 2. **Equirectangular Projection**: Maps longitude $[0^\circ, 360^\circ]$ uniformly across the horizontal $U \in [0.0, 1.0]$ axis, and latitude $[-90^\circ, +90^\circ]$ uniformly across the vertical $V \in [0.0, 1.0]$ axis.
 3. **Vertical Orientation**: Images are loaded with `stbi_set_flip_vertically_on_load(1)` so that image row 0 corresponds to the South Pole ($V = 0.0$) and the top row corresponds to the North Pole ($V = 1.0$), aligning with standard OpenGL Cartesian conventions.
+

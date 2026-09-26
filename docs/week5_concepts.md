@@ -125,3 +125,4 @@ $$\mathbf{M} = \mathbf{R}_y(\theta_{\text{orbit}}) \cdot \mathbf{T}_x(R) \cdot \
 1. **Orbital Revolution**: The planet moves around the Sun along its orbit; texture coordinates remain anchored to the sphere's local frame.
 2. **Axial Rotation**: The planet rotates around its polar $Y$-axis; the texture coordinates rotate with the geometry, causing continents and atmospheric storms to continuously rotate naturally across the view.
 3. **Earth-Moon Hierarchy**: The Moon's local coordinate frame is translated to Earth's position and rotated in its orbit; the Moon's cratered texture orbits Earth and spins synchronously with its tidal rotation speed.
+
