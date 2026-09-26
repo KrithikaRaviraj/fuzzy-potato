@@ -14,6 +14,7 @@
 #include <GL/freeglut.h>
 #include "planet.h"
 #include "sphere.h"
+#include "texture.h"
 
 #define PI_CONST 3.14159265358979323846f
 
@@ -64,7 +65,6 @@ static const float moon_orbit_speed = 120.0f;
 static const float moon_rotation_speed = 120.0f;
 static float moon_orbit_angle = 0.0f;
 static float moon_rotation_angle = 0.0f;
-static const GLfloat moon_color[3] = { 0.75f, 0.75f, 0.78f };
 
 /*
  * Initial reference positions matching Week 3 startup.
@@ -85,8 +85,9 @@ static void render_saturn_rings(float inner_radius, float outer_radius) {
     /* Tilt Saturn's ring system (~25 degrees) relative to its orbital plane */
     glRotatef(25.0f, 1.0f, 0.0f, 0.4f);
 
-    /* Render ring as flat geometry without lighting distortions */
+    /* Render ring as flat geometry without lighting distortions or textures */
     glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
     glColor3f(0.78f, 0.72f, 0.55f); /* Warm golden ring dust */
 
     /* Flat ring disk using quad strip */
@@ -275,10 +276,10 @@ void planets_render(void) {
             glPushMatrix();
             glRotatef(moon_rotation_angle, 0.0f, 1.0f, 0.0f);
 
-            /* Lunar material properties under GL_LIGHT0 point light */
-            GLfloat moon_amb[4]  = { moon_color[0] * 0.25f, moon_color[1] * 0.25f, moon_color[2] * 0.25f, 1.0f };
-            GLfloat moon_diff[4] = { moon_color[0], moon_color[1], moon_color[2], 1.0f };
-            GLfloat moon_spec[4] = { 0.10f, 0.10f, 0.10f, 1.0f };
+            /* Lunar material properties and texture mapping under GL_LIGHT0 */
+            GLfloat moon_amb[4]   = { 0.20f, 0.20f, 0.20f, 1.0f };
+            GLfloat moon_diff[4]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+            GLfloat moon_spec[4]  = { 0.10f, 0.10f, 0.10f, 1.0f };
             GLfloat moon_emiss[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
             glMaterialfv(GL_FRONT, GL_AMBIENT, moon_amb);
@@ -287,7 +288,9 @@ void planets_render(void) {
             glMaterialfv(GL_FRONT, GL_EMISSION, moon_emiss);
             glMaterialf(GL_FRONT, GL_SHININESS, 5.0f);
 
-            sphere_draw(moon_radius, 20, 20);
+            texture_bind(texture_get_moon());
+            sphere_draw(moon_radius, 24, 24);
+            texture_unbind();
 
             glPopMatrix(); /* Restore from Moon axial rotation */
             glPopMatrix(); /* Restore from Moon orbital frame */
@@ -303,12 +306,12 @@ void planets_render(void) {
         glRotatef(p->rotation_angle, 0.0f, 1.0f, 0.0f);
 
         /*
-         * 6. Configure material properties for fixed-function lighting.
+         * 6. Configure material properties for fixed-function lighting and texturing.
          * The Sun (GL_LIGHT0 at origin) illuminates the inward-facing
          * hemisphere of each planet via diffuse reflection.
          */
-        GLfloat mat_ambient[4]  = { p->color[0] * 0.25f, p->color[1] * 0.25f, p->color[2] * 0.25f, 1.0f };
-        GLfloat mat_diffuse[4]  = { p->color[0], p->color[1], p->color[2], 1.0f };
+        GLfloat mat_ambient[4]  = { 0.20f, 0.20f, 0.20f, 1.0f };
+        GLfloat mat_diffuse[4]  = { 1.0f, 1.0f, 1.0f, 1.0f };
         GLfloat mat_specular[4] = { 0.15f, 0.15f, 0.15f, 1.0f };
         GLfloat mat_emission[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; /* Non-emissive */
 
@@ -318,8 +321,10 @@ void planets_render(void) {
         glMaterialfv(GL_FRONT, GL_EMISSION, mat_emission);
         glMaterialf(GL_FRONT, GL_SHININESS, 10.0f);
 
-        /* Draw 3D solid sphere */
-        sphere_draw(p->radius, 32, 32);
+        /* Bind planet texture and draw textured 3D sphere */
+        texture_bind(texture_get_planet(i));
+        sphere_draw(p->radius, 36, 36);
+        texture_unbind();
 
         glPopMatrix(); /* Restore from planet axial rotation */
 

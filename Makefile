@@ -1,12 +1,12 @@
 # Interactive 3D Solar System and Space Exploration Simulator
 # Makefile for GCC (MSYS2 UCRT64 / MinGW-w64)
-# Week 4: Rotation, Revolution and Moon
+# Week 5: Texture Mapping
 
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -Iinclude
 LDFLAGS = -lfreeglut -lopengl32 -lglu32
 
-SRC = src/main.c src/camera.c src/sphere.c src/lighting.c src/sun.c src/planet.c src/orbit.c
+SRC = src/main.c src/camera.c src/sphere.c src/lighting.c src/sun.c src/planet.c src/orbit.c src/texture.c
 TARGET = bin/solar_sim.exe
 
 all: $(TARGET)

@@ -2,7 +2,7 @@
 REM ====================================================================
 REM Interactive 3D Solar System and Space Exploration Simulator
 REM Build script for Windows using GCC (MSYS2 UCRT64)
-REM Week 4: Rotation, Revolution and Moon
+REM Week 5: Texture Mapping
 REM ====================================================================
 
 setlocal
@@ -14,8 +14,8 @@ if not exist bin (
     mkdir bin
 )
 
-echo [BUILD] Compiling 3D Solar System Simulator (Week 4: Rotation, Revolution and Moon)...
-gcc -Wall -Wextra -std=c99 src\main.c src\camera.c src\sphere.c src\lighting.c src\sun.c src\planet.c src\orbit.c -Iinclude -o bin\solar_sim.exe -lfreeglut -lopengl32 -lglu32
+echo [BUILD] Compiling 3D Solar System Simulator (Week 5: Texture Mapping)...
+gcc -Wall -Wextra -std=c99 src\main.c src\camera.c src\sphere.c src\lighting.c src\sun.c src\planet.c src\orbit.c src\texture.c -Iinclude -o bin\solar_sim.exe -lfreeglut -lopengl32 -lglu32
 
 if %ERRORLEVEL% equ 0 (
     echo [BUILD] Build successful! Binary: bin\solar_sim.exe

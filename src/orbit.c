@@ -25,10 +25,10 @@ void orbit_draw(float distance) {
 
     /*
      * Orbit lines are purely geometric visual guides and should not be
-     * subjected to surface lighting calculations. Disabling GL_LIGHTING
-     * ensures consistent, crisp line rendering.
+     * subjected to surface lighting or texturing.
      */
     glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
 
     /* Subtle cosmic blue-grey line color */
     glColor3f(0.25f, 0.32f, 0.42f);
