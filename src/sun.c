@@ -1,81 +1,94 @@
 /*
  * Interactive 3D Solar System and Space Exploration Simulator
- * Week 2: 3D Scene & First Objects
+ * Week 5: Texture Mapping
  * Developer: Krithika
  *
  * File: src/sun.c
- * Description: Implementation of the central Sun 3D object.
+ * Description: Implementation of the textured central Sun 3D object.
  *
  * Architecture Notes:
- * - Uses the reusable sphere renderer (sphere_draw) from sphere.c.
- * - Model transformations are cleanly isolated using glPushMatrix() / glPopMatrix().
- * - Sets material emission (GL_EMISSION) so the Sun visually appears bright/self-lit.
- * - Resets emission to zero after drawing to prevent state leakage to other objects.
- * - Note: Material emission produces a visible glow on the Sun's surface, but in
- *   OpenGL fixed-function lighting, it does NOT cast light onto other objects.
- *   The scene's actual illumination is provided by GL_LIGHT0.
+ * - Uses the reusable sphere renderer (sphere_draw) with equirectangular UV mapping.
+ * - Binds the high-resolution solar photosphere texture (granulation, flares, limb darkening).
+ * - Rendered self-luminously so that the photosphere details appear vibrant and unattenuated.
+ * - Features slow axial rotation to realistically simulate the differential solar rotation.
+ * - Cleanly restores OpenGL lighting state and unbinds textures after rendering.
+ * - Point light GL_LIGHT0 remains anchored at (0, 0, 0) to illuminate the surrounding planets.
  */
 
 #include <GL/freeglut.h>
 #include "sun.h"
 #include "sphere.h"
+#include "texture.h"
 
 /* Visual scale configuration for the Sun */
 static const float SUN_RADIUS = 1.2f;
-static const int   SUN_SLICES = 40;
-static const int   SUN_STACKS = 40;
+static const int   SUN_SLICES = 48;
+static const int   SUN_STACKS = 48;
 
-/* Material properties for the Sun */
-static const GLfloat sun_emission[] = { 1.0f, 0.75f, 0.1f, 1.0f };   /* Golden-yellow glow */
-static const GLfloat sun_diffuse[]  = { 1.0f, 0.85f, 0.2f, 1.0f };   /* Warm yellow body */
-static const GLfloat sun_ambient[]  = { 0.4f, 0.3f, 0.0f, 1.0f };    /* Warm ambient reflection */
-static const GLfloat sun_specular[] = { 0.0f, 0.0f, 0.0f, 1.0f };    /* No specular highlight */
-
-/* Default zero emission for clean state restoration */
-static const GLfloat zero_emission[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+/* Solar axial rotation state */
+static float sun_rotation_angle = 0.0f;
+static const float sun_rotation_speed = 8.0f; /* deg/s (pedagogical slow drift) */
 
 void sun_init(void) {
-    /* Ready for future state expansion if needed */
+    sun_rotation_angle = 0.0f;
+}
+
+void sun_update(float delta_time) {
+    if (delta_time <= 0.0f) {
+        return;
+    }
+
+    sun_rotation_angle += sun_rotation_speed * delta_time;
+    while (sun_rotation_angle >= 360.0f) {
+        sun_rotation_angle -= 360.0f;
+    }
+    while (sun_rotation_angle < 0.0f) {
+        sun_rotation_angle += 360.0f;
+    }
 }
 
 float sun_get_radius(void) {
     return SUN_RADIUS;
 }
 
+float sun_get_rotation_angle(void) {
+    return sun_rotation_angle;
+}
+
 void sun_render(void) {
     /*
      * 1. Isolate the model transformation matrix.
-     * Pushing the modelview matrix guarantees that the Sun's local transformations
-     * (translation, rotation, scaling) do not affect the camera view or subsequent objects.
      */
     glPushMatrix();
 
     /*
      * 2. Apply model transformation:
-     * Translate the Sun to the central origin of the Solar System.
+     * Position at the central origin and apply axial rotation.
      */
     glTranslatef(0.0f, 0.0f, 0.0f);
+    glRotatef(sun_rotation_angle, 0.0f, 1.0f, 0.0f);
 
     /*
-     * 3. Apply material properties:
-     * Configure the Sun's surface to display an emissive glow and warm color.
+     * 3. Render Sun self-luminously with texture:
+     * Disabling lighting ensures that the solar photosphere texture is displayed
+     * at full luminous brilliance without self-shadowing, while GL_LIGHT0 at
+     * the origin continues to illuminate all surrounding planets.
      */
-    glMaterialfv(GL_FRONT, GL_EMISSION, sun_emission);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE,  sun_diffuse);
-    glMaterialfv(GL_FRONT, GL_AMBIENT,  sun_ambient);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, sun_specular);
+    glDisable(GL_LIGHTING);
+    texture_bind(texture_get_sun());
+    glColor3f(1.0f, 1.0f, 1.0f);
 
     /*
-     * 4. Render the 3D geometry using the reusable sphere renderer.
+     * 4. Draw the textured 3D sphere.
      */
     sphere_draw(SUN_RADIUS, SUN_SLICES, SUN_STACKS);
 
     /*
-     * 5. Reset material emission back to zero.
-     * Critical in fixed-function OpenGL state machine so that other objects
-     * (e.g. planets introduced in later weeks) do not inherit this emission.
+     * 5. Clean state restoration:
+     * Unbind texture and restore lighting for planetary rendering.
      */
-    glMaterialfv(GL_FRONT, GL_EMISSION, zero_emission);
+    texture_unbind();
+    glEnable(GL_LIGHTING);
 
     /*
      * 6. Restore the modelview matrix.

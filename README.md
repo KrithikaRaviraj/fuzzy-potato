@@ -6,17 +6,19 @@ An interactive, real-time 3D simulation of the Solar System and space exploratio
 
 ## Current Status
 
-**Week 4 - Rotation, Revolution & Moon**
+**Week 5 - Texture Mapping**
 
-The project has introduced dynamic kinematics, orbital revolution, axial spin, and multi-level hierarchical satellite modeling:
-* **Planetary Orbital Revolution**: Continuous orbital revolution of all 8 planets around the Sun along their circular coplanar orbits ($Y = 0$). Revolution speeds follow Keplerian-inspired pedagogical scaling (Mercury fastest at $48^\circ/\text{s}$ down to Neptune at $3.5^\circ/\text{s}$).
-* **Planetary Axial Rotation**: Continuous axial spinning of every planet around its own local polar axis.
-* **Earth-Moon Hierarchical Modeling**: The Moon is modeled as a child satellite in a multi-level transformation hierarchy (`Sun -> Earth Orbit -> Earth Translation -> Moon Orbit -> Moon Translation -> Moon Spin`).
-* **Transformation Matrix Isolation**: Earth's axial rotation is isolated with `glPushMatrix` / `glPopMatrix` so that Earth's fast daily spin does not rotate the Moon's orbital plane.
-* **Frame-Rate Independent Animation**: Time-driven animation utilizing FreeGLUT's `glutTimerFunc` (~60 FPS) and wall-clock delta-time calculation (`glutGet(GLUT_ELAPSED_TIME)`), with safe first-frame initialization and stall clamping (max 0.1s).
-* **Angle Normalization**: All planetary and lunar orbital/rotational angles wrap safely within $[0^\circ, 360^\circ)$ to prevent floating-point precision degradation.
-* **Preserved Week 3 Starting Positions**: Planets start from their Week 3 reference positions, seamlessly animating onward.
-* **Dynamic Lighting & Day/Night Cycles**: The central point light (`GL_LIGHT0`) illuminates the inward-facing hemisphere of each revolving planet, producing dynamic day/night cycles and natural lunar phases.
+The project introduces photorealistic 2D texture mapping across all celestial bodies while fully preserving all dynamic kinematics, hierarchy, lighting, and camera systems:
+* **All 8 Textured Planets**: Authentic equirectangular photographic surface maps for Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune (sourced from NASA / Solar System Scope).
+* **Luminous Textured Sun**: The Sun is mapped with high-resolution solar photosphere imagery, showcasing surface granulation, flares, sunspots, and natural limb darkening, eliminating the uniform flat-yellow appearance.
+* **Textured Moon**: High-resolution lunar surface map showing craters and lunar maria, orbiting Earth in a multi-level hierarchy.
+* **Starfield Cosmic Background**: Immersive panoramic Milky Way starfield background sphere rendered behind all scene elements.
+* **Spherical UV Mapping**: Reusable parametric 3D sphere generator with analytical surface normals and equirectangular spherical $(u, v)$ coordinates.
+* **Trilinear Mipmapping & Filtering**: Full mipmap pyramid generation via `gluBuild2DMipmaps`, configured with `GL_LINEAR_MIPMAP_LINEAR` minification to eliminate aliasing and moiré shimmering at all distances.
+* **Dynamic Day/Night Lighting Integration**: Fixed-function `GL_LIGHT0` point lighting modulates texture colors (`GL_MODULATE`), dynamically illuminating sunlit hemispheres while casting natural shadows on the night side.
+* **Preserved Dynamic Kinematics**: All Week 4 orbital revolution, axial rotation, Earth-Moon hierarchy, and Saturn ring geometry remain intact.
+* **Strict State Management**: Clean OpenGL state isolation prevents texture bleeding onto non-textured geometry (orbits and Saturn rings).
+* **Robust Resource Management**: Textures load once at initialization into GPU memory, and are freed cleanly on simulator exit.
 
 ---
 
@@ -25,6 +27,7 @@ The project has introduced dynamic kinematics, orbital revolution, axial spin, a
 * **Language**: C (C99 standard)
 * **Graphics API**: OpenGL (Desktop OpenGL with GLU)
 * **Window & Event Management**: FreeGLUT (v3.8.0)
+* **Image Loading**: `stb_image.h` (v2.30, public domain / MIT by Sean Barrett)
 * **Compiler / Toolchain**: GCC 15.2.0 (MSYS2 UCRT64 `x86_64-w64-mingw32`)
 * **Version Control**: Git + GitHub
 
@@ -53,22 +56,38 @@ fuzzy-potato/
 ├── src/
 │   ├── main.c          # Application entry point, FreeGLUT timer and event loop
 │   ├── camera.c        # Camera navigation and view matrix management
-│   ├── sphere.c        # Reusable 3D sphere rendering abstraction with normals
+│   ├── sphere.c        # 3D sphere generator with normals and spherical UV mapping
 │   ├── lighting.c      # Fixed-function OpenGL lighting initialization and positioning
-│   ├── sun.c           # Central Sun 3D object rendering and material properties
-│   ├── planet.c        # Dynamic 8-planet data structure, Moon hierarchy, and Saturn ring
-│   └── orbit.c         # Circular parametric orbit line rendering on X-Z plane
+│   ├── sun.c           # Central textured Sun rendering and axial rotation
+│   ├── planet.c        # Dynamic 8-planet data structure, Moon hierarchy, and textures
+│   ├── orbit.c         # Circular parametric orbit line rendering on X-Z plane
+│   └── texture.c       # Texture loading, binding, mipmapping, and cleanup subsystem
 ├── include/
 │   ├── camera.h        # Camera interface
-│   ├── sphere.h        # Reusable sphere renderer interface
+│   ├── sphere.h        # Sphere renderer interface
 │   ├── lighting.h      # Lighting subsystem interface
 │   ├── sun.h           # Sun subsystem interface
-│   ├── planet.h        # Planet subsystem interface, animation update, and Moon accessors
-│   └── orbit.h         # Orbit subsystem interface
-├── textures/           # Surface textures and skybox maps (reserved for future weeks)
-├── assets/             # 3D object models and simulation assets (reserved for future weeks)
+│   ├── planet.h        # Planet subsystem interface and Moon accessors
+│   ├── orbit.h         # Orbit subsystem interface
+│   ├── texture.h       # Texture subsystem interface
+│   └── stb_image.h     # Single-header image loader
+├── textures/           # High-resolution planetary and celestial surface textures
+│   ├── sun.jpg         # Solar photosphere map
+│   ├── mercury.jpg     # Mercury surface map
+│   ├── venus.jpg       # Venus atmosphere map
+│   ├── earth.jpg       # Earth daytime surface map
+│   ├── moon.jpg        # Lunar surface map
+│   ├── mars.jpg        # Mars surface map
+│   ├── jupiter.jpg     # Jupiter cloud bands and Great Red Spot map
+│   ├── saturn.jpg      # Saturn cloud bands map
+│   ├── uranus.jpg      # Uranus atmosphere map
+│   ├── neptune.jpg     # Neptune atmosphere map
+│   ├── stars.jpg       # Milky Way cosmic starfield map
+│   └── saturn_ring.png # Saturn ring texture profile
 ├── docs/               # Technical guides and Computer Graphics concepts documentation
-│   ├── week4_concepts.md # Comprehensive guide: delta time, kinematics, Moon hierarchy
+│   ├── week5_concepts.md # Comprehensive guide: UV mapping, mipmaps, texture/light interaction
+│   ├── texture_sources.md # Texture provenance, NASA mission sources, and CC BY 4.0 licenses
+│   ├── week4_concepts.md # Week 4 guide: delta time, kinematics, Moon hierarchy
 │   ├── week3_concepts.md # Week 3 guide: hierarchical modeling, orbits, lighting
 │   ├── week2_concepts.md # Week 2 concepts: coordinate systems, transformations, projection
 │   ├── compiler_setup.md # MSYS2 GCC UCRT64 environment guide
@@ -101,7 +120,7 @@ fuzzy-potato/
 
 ## Build & Run Instructions
 
-### Option 1: Using Windows Batch Scripts (Recommended)
+Using Windows Batch Scripts (Recommended)
 
 1. **Build**:
    ```cmd

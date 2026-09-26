@@ -1,12 +1,12 @@
 /*
  * Interactive 3D Solar System and Space Exploration Simulator
- * Week 4: Rotation, Revolution & Moon
+ * Week 5: Texture Mapping
  * Team: Krithika & Akshatha
  * Developer: Krithika
  *
  * File: src/main.c
  * Description: 3D Scene setup, perspective projection, lighting, camera integration,
- *              and time-based dynamic animation loop (rotation, revolution, Moon).
+ *              time-based dynamic animation loop, and 2D texture mapping.
  *
  * 3D Coordinate System Convention (Standard OpenGL Right-Handed):
  *   +X axis : Extends to the right
@@ -19,13 +19,14 @@
  *
  * Graphics Transformation Pipeline:
  *   1. View Transformation  : camera_apply() via gluLookAt() aligns eye/camera space.
- *   2. Light Positioning    : lighting_apply() fixes GL_LIGHT0 at world origin (0, 0, 0).
- *   3. Solar Body Rendering : sun_render() translates and renders the central Sun.
- *   4. Orbit Paths          : orbits_render_all() draws circular line loops on X-Z plane.
- *   5. Dynamic Planets      : planets_render() hierarchically updates and draws 8 planets
+ *   2. Background Stars     : Render textured celestial starfield sphere.
+ *   3. Light Positioning    : lighting_apply() fixes GL_LIGHT0 at world origin (0, 0, 0).
+ *   4. Solar Body Rendering : sun_render() translates, rotates, and renders textured Sun.
+ *   5. Orbit Paths          : orbits_render_all() draws circular line loops on X-Z plane.
+ *   6. Dynamic Planets      : planets_render() hierarchically updates and draws 8 textured planets
  *                             and the Earth-Moon child system.
- *   6. Projection           : gluPerspective() converts eye space to clip coordinates.
- *   7. Viewport Mapping     : glViewport() maps normalized coordinates to window pixels.
+ *   7. Projection           : gluPerspective() converts eye space to clip coordinates.
+ *   8. Viewport Mapping     : glViewport() maps normalized coordinates to window pixels.
  */
 
 #include <stdio.h>
@@ -37,6 +38,7 @@
 #include "sun.h"
 #include "planet.h"
 #include "orbit.h"
+#include "texture.h"
 
 /* Window dimensions */
 static int window_width = 1024;
@@ -44,6 +46,30 @@ static int window_height = 768;
 
 /* Previous timestamp for elapsed delta-time calculation (milliseconds) */
 static int previous_time = 0;
+
+/*
+ * Render cosmic starfield background sphere.
+ */
+static void render_stars_background(void) {
+    GLuint stars_tex = texture_get_stars();
+    if (stars_tex == 0) {
+        return;
+    }
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+    texture_bind(stars_tex);
+    glColor3f(0.55f, 0.55f, 0.55f); /* Soft starry luminance */
+
+    glPushMatrix();
+    glRotatef(20.0f, 1.0f, 0.0f, 0.5f);
+    sphere_draw(-70.0f, 32, 24); /* Negative radius draws inward-facing sphere */
+    glPopMatrix();
+
+    texture_unbind();
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+}
 
 /*
  * Timer callback: computes elapsed delta time and drives planetary animation.
@@ -68,7 +94,8 @@ static void timer_callback(int value) {
         delta_time = 0.0f;
     }
 
-    /* Update dynamic planetary rotation and revolution angles */
+    /* Update dynamic solar rotation, planetary rotation, and orbital revolution angles */
+    sun_update(delta_time);
     planets_update(delta_time);
 
     /* Request screen redraw */
@@ -79,7 +106,7 @@ static void timer_callback(int value) {
 }
 
 /*
- * Initialize OpenGL state for 3D rendering and lighting.
+ * Initialize OpenGL state for 3D rendering, lighting, and textures.
  */
 static void init_opengl(void) {
     /* Set background clear color (deep space darkness) */
@@ -92,6 +119,9 @@ static void init_opengl(void) {
     /* Initialize fixed-function lighting foundation */
     lighting_init();
 
+    /* Load texture assets */
+    textures_init();
+
     /* Initialize celestial bodies and starting angles */
     sun_init();
     planets_init();
@@ -99,7 +129,7 @@ static void init_opengl(void) {
     /* Configure initial perspective projection matrix */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, (double)window_width / (double)window_height, 0.1, 100.0);
+    gluPerspective(45.0, (double)window_width / (double)window_height, 0.1, 150.0);
 
     /* Return to modelview matrix */
     glMatrixMode(GL_MODELVIEW);
@@ -120,23 +150,29 @@ static void display_callback(void) {
     camera_apply();
 
     /*
-     * 2. Light Source Positioning:
+     * 2. Background Starfield:
+     * Render cosmic starfield sphere behind all scene geometry.
+     */
+    render_stars_background();
+
+    /*
+     * 3. Light Source Positioning:
      * Position point light GL_LIGHT0 in world coordinates at (0, 0, 0) matching the Sun.
      */
     lighting_apply();
 
     /*
-     * 3. Render the central Sun at (0, 0, 0).
+     * 4. Render the central textured Sun at (0, 0, 0).
      */
     sun_render();
 
     /*
-     * 4. Render circular planetary orbit paths on the X-Z plane.
+     * 5. Render circular planetary orbit paths on the X-Z plane.
      */
     orbits_render_all();
 
     /*
-     * 5. Render all 8 planets and Earth-Moon hierarchy at their dynamic positions.
+     * 6. Render all 8 textured planets and Earth-Moon hierarchy at dynamic positions.
      */
     planets_render();
 
@@ -161,7 +197,7 @@ static void reshape_callback(int width, int height) {
     /* Update projection matrix with appropriate aspect ratio */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, (double)width / (double)height, 0.1, 100.0);
+    gluPerspective(45.0, (double)width / (double)height, 0.1, 150.0);
 
     /* Return to modelview matrix */
     glMatrixMode(GL_MODELVIEW);
@@ -196,7 +232,7 @@ static void keyboard_callback(unsigned char key, int x, int y) {
 int main(int argc, char** argv) {
     printf("====================================================\n");
     printf(" 3D Solar System & Space Exploration Simulator\n");
-    printf(" Week 4: Rotation, Revolution & Moon\n");
+    printf(" Week 5: Texture Mapping\n");
     printf(" Team: Krithika & Akshatha\n");
     printf(" Developer: Krithika\n");
     printf("====================================================\n");
@@ -208,9 +244,9 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(50, 50);
 
     /* 2. Create window */
-    glutCreateWindow("Solar System Simulator - Week 4: Rotation, Revolution & Moon");
+    glutCreateWindow("Solar System Simulator - Week 5: Texture Mapping");
 
-    /* 3. Initialize OpenGL 3D settings and lighting */
+    /* 3. Initialize OpenGL 3D settings, lighting, and textures */
     init_opengl();
     camera_init();
 
@@ -227,7 +263,7 @@ int main(int argc, char** argv) {
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
     printf("[SolarSim] Window created successfully.\n");
-    printf("[SolarSim] Loaded %d planets + Earth Moon system.\n", planets_get_count());
+    printf("[SolarSim] Loaded %d planets + Earth Moon system + textures.\n", planets_get_count());
     printf("[Controls] W/S: Move Forward / Backward\n");
     printf("[Controls] A/D: Move Left / Right\n");
     printf("[Controls] Z/X: Zoom In / Out (Viewing Distance)\n");
@@ -239,6 +275,9 @@ int main(int argc, char** argv) {
 
     /* 5. Enter FreeGLUT event loop */
     glutMainLoop();
+
+    /* 6. Release texture resources on clean exit */
+    textures_cleanup();
 
     printf("[SolarSim] Application terminated cleanly.\n");
     fflush(stdout);
