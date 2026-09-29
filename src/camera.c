@@ -15,6 +15,7 @@ static float camera_z = 28.0f;
 /* Camera movement speed scaled for solar system dimensions */
 static const float CAMERA_SPEED = 0.5f;
 static const float VIEW_DISTANCE_STEP = 1.0f;
+static float camera_view_distance = 28.0f;
 static int focused_planet = -1;
 
 /* Initialize camera */
@@ -23,6 +24,7 @@ void camera_init(void)
     camera_x = 0.0f;
     camera_y = 16.0f;
     camera_z = 28.0f;
+    camera_view_distance = 28.0f;
 }
 
 /* Move camera using keyboard */
@@ -140,9 +142,11 @@ void camera_apply(void)
 /* Reset camera */
 void camera_reset(void)
 {
+    focused_planet = -1;
     camera_x = 0.0f;
     camera_y = 16.0f;
     camera_z = 28.0f;
+    camera_view_distance = 28.0f;
 }
 void camera_focus_planet(int index)
 {
