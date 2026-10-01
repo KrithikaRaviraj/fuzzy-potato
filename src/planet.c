@@ -41,14 +41,78 @@
  *   Jupiter (12.0) > Saturn (8.5) > Uranus (5.5) > Neptune (3.5)
  */
 static Planet planets[PLANET_COUNT] = {
-    { "Mercury", 0.18f,  2.5f,  45.0f, 48.0f, 0.0f, 15.0f, { 0.70f, 0.70f, 0.72f } }, /* Silvery rocky grey */
-    { "Venus",   0.28f,  3.6f, 110.0f, 35.0f, 0.0f, 10.0f, { 0.95f, 0.88f, 0.55f } }, /* Bright golden cream */
-    { "Earth",   0.30f,  4.8f, 195.0f, 25.0f, 0.0f, 50.0f, { 0.18f, 0.58f, 0.92f } }, /* Vibrant ocean blue */
-    { "Mars",    0.22f,  6.0f, 285.0f, 20.0f, 0.0f, 45.0f, { 0.88f, 0.30f, 0.15f } }, /* Rusty terracotta red */
-    { "Jupiter", 0.70f,  8.2f,  65.0f, 12.0f, 0.0f, 90.0f, { 0.78f, 0.52f, 0.28f } }, /* Warm brownish-amber */
-    { "Saturn",  0.58f, 10.5f, 155.0f,  8.5f, 0.0f, 80.0f, { 0.88f, 0.78f, 0.40f } }, /* Pale straw gold */
-    { "Uranus",  0.42f, 12.8f, 240.0f,  5.5f, 0.0f, 60.0f, { 0.40f, 0.85f, 0.85f } }, /* Bright cyan / aquamarine */
-    { "Neptune", 0.40f, 15.0f, 330.0f,  3.5f, 0.0f, 55.0f, { 0.12f, 0.25f, 0.85f } }  /* Deep cobalt azure */
+    /* Mercury: Airless, heavily cratered dark rock, very matte, low reflectivity */
+    {
+        "Mercury", 0.18f,  2.5f,  45.0f, 48.0f, 0.0f, 15.0f,
+        { 0.70f, 0.70f, 0.72f },
+        { 0.15f, 0.15f, 0.15f, 1.0f }, /* ambient */
+        { 0.95f, 0.95f, 0.95f, 1.0f }, /* diffuse */
+        { 0.08f, 0.08f, 0.08f, 1.0f }, /* specular: very low */
+        6.0f                            /* shininess: broad diffuse scatter */
+    },
+    /* Venus: Dense, highly reflective sulfuric acid clouds, high albedo, soft cloud sheen */
+    {
+        "Venus",   0.28f,  3.6f, 110.0f, 35.0f, 0.0f, 10.0f,
+        { 0.95f, 0.88f, 0.55f },
+        { 0.22f, 0.22f, 0.20f, 1.0f }, /* ambient */
+        { 1.00f, 1.00f, 1.00f, 1.0f }, /* diffuse */
+        { 0.35f, 0.35f, 0.30f, 1.0f }, /* specular: bright cloud haze */
+        22.0f                           /* shininess: smooth cloud deck */
+    },
+    /* Earth: 71% liquid oceans and atmosphere, strong oceanic specular glint */
+    {
+        "Earth",   0.30f,  4.8f, 195.0f, 25.0f, 0.0f, 50.0f,
+        { 0.18f, 0.58f, 0.92f },
+        { 0.20f, 0.20f, 0.22f, 1.0f }, /* ambient */
+        { 1.00f, 1.00f, 1.00f, 1.0f }, /* diffuse */
+        { 0.50f, 0.50f, 0.55f, 1.0f }, /* specular: vivid ocean glint */
+        38.0f                           /* shininess: focused liquid highlight */
+    },
+    /* Mars: Dry, dusty iron-oxide basalt surface, matte scattering */
+    {
+        "Mars",    0.22f,  6.0f, 285.0f, 20.0f, 0.0f, 45.0f,
+        { 0.88f, 0.30f, 0.15f },
+        { 0.18f, 0.16f, 0.15f, 1.0f }, /* ambient */
+        { 0.98f, 0.95f, 0.95f, 1.0f }, /* diffuse */
+        { 0.12f, 0.10f, 0.10f, 1.0f }, /* specular: low dry dust */
+        10.0f                           /* shininess: matte surface */
+    },
+    /* Jupiter: Massive gas giant, turbulent atmospheric clouds, moderate sheen */
+    {
+        "Jupiter", 0.70f,  8.2f,  65.0f, 12.0f, 0.0f, 90.0f,
+        { 0.78f, 0.52f, 0.28f },
+        { 0.20f, 0.20f, 0.18f, 1.0f }, /* ambient */
+        { 1.00f, 1.00f, 0.98f, 1.0f }, /* diffuse */
+        { 0.25f, 0.23f, 0.20f, 1.0f }, /* specular: atmospheric cloud glow */
+        18.0f                           /* shininess: gaseous cloud deck */
+    },
+    /* Saturn: Pale ammonia haze overlying banded clouds, soft sheen */
+    {
+        "Saturn",  0.58f, 10.5f, 155.0f,  8.5f, 0.0f, 80.0f,
+        { 0.88f, 0.78f, 0.40f },
+        { 0.20f, 0.20f, 0.18f, 1.0f }, /* ambient */
+        { 1.00f, 0.98f, 0.95f, 1.0f }, /* diffuse */
+        { 0.22f, 0.22f, 0.18f, 1.0f }, /* specular: muted haze scatter */
+        16.0f                           /* shininess: soft cloud layer */
+    },
+    /* Uranus: Deep icy methane aerosol haze, smooth reflection */
+    {
+        "Uranus",  0.42f, 12.8f, 240.0f,  5.5f, 0.0f, 60.0f,
+        { 0.40f, 0.85f, 0.85f },
+        { 0.22f, 0.24f, 0.24f, 1.0f }, /* ambient */
+        { 1.00f, 1.00f, 1.00f, 1.0f }, /* diffuse */
+        { 0.30f, 0.35f, 0.35f, 1.0f }, /* specular: icy methane glaze */
+        26.0f                           /* shininess: smooth ice/gas haze */
+    },
+    /* Neptune: Dynamic deep methane atmosphere with icy cirrus clouds */
+    {
+        "Neptune", 0.40f, 15.0f, 330.0f,  3.5f, 0.0f, 55.0f,
+        { 0.12f, 0.25f, 0.85f },
+        { 0.20f, 0.22f, 0.25f, 1.0f }, /* ambient */
+        { 1.00f, 1.00f, 1.00f, 1.0f }, /* diffuse */
+        { 0.32f, 0.35f, 0.40f, 1.0f }, /* specular: icy atmospheric sheen */
+        28.0f                           /* shininess: deep planetary atmosphere */
+    }
 };
 
 /*
@@ -57,7 +121,7 @@ static Planet planets[PLANET_COUNT] = {
  * Orbital distance from Earth: 0.70
  * Orbital revolution speed: 120.0 deg/s
  * Axial rotation speed: 120.0 deg/s (tidally locked model)
- * Color: neutral lunar grey
+ * Material: Airless fine silicate regolith and dark basalt, very matte.
  */
 static const float moon_radius = 0.08f;
 static const float moon_orbit_distance = 0.70f;
@@ -65,6 +129,12 @@ static const float moon_orbit_speed = 120.0f;
 static const float moon_rotation_speed = 120.0f;
 static float moon_orbit_angle = 0.0f;
 static float moon_rotation_angle = 0.0f;
+
+static const GLfloat moon_ambient[4]  = { 0.14f, 0.14f, 0.14f, 1.0f };
+static const GLfloat moon_diffuse[4]  = { 0.95f, 0.95f, 0.95f, 1.0f };
+static const GLfloat moon_specular[4] = { 0.06f, 0.06f, 0.06f, 1.0f };
+static const GLfloat moon_shininess   = 4.0f;
+
 
 /*
  * Initial reference positions matching Week 3 startup.
@@ -277,16 +347,13 @@ void planets_render(void) {
             glRotatef(moon_rotation_angle, 0.0f, 1.0f, 0.0f);
 
             /* Lunar material properties and texture mapping under GL_LIGHT0 */
-            GLfloat moon_amb[4]   = { 0.20f, 0.20f, 0.20f, 1.0f };
-            GLfloat moon_diff[4]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-            GLfloat moon_spec[4]  = { 0.10f, 0.10f, 0.10f, 1.0f };
-            GLfloat moon_emiss[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+            static const GLfloat moon_emiss[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-            glMaterialfv(GL_FRONT, GL_AMBIENT, moon_amb);
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, moon_diff);
-            glMaterialfv(GL_FRONT, GL_SPECULAR, moon_spec);
+            glMaterialfv(GL_FRONT, GL_AMBIENT, moon_ambient);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, moon_diffuse);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, moon_specular);
             glMaterialfv(GL_FRONT, GL_EMISSION, moon_emiss);
-            glMaterialf(GL_FRONT, GL_SHININESS, 5.0f);
+            glMaterialf(GL_FRONT, GL_SHININESS, moon_shininess);
 
             texture_bind(texture_get_moon());
             sphere_draw(moon_radius, 24, 24);
@@ -308,18 +375,16 @@ void planets_render(void) {
         /*
          * 6. Configure material properties for fixed-function lighting and texturing.
          * The Sun (GL_LIGHT0 at origin) illuminates the inward-facing
-         * hemisphere of each planet via diffuse reflection.
+         * hemisphere of each planet via diffuse and specular reflection.
+         * Each planet uses differentiated, scientifically calibrated material parameters.
          */
-        GLfloat mat_ambient[4]  = { 0.20f, 0.20f, 0.20f, 1.0f };
-        GLfloat mat_diffuse[4]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-        GLfloat mat_specular[4] = { 0.15f, 0.15f, 0.15f, 1.0f };
-        GLfloat mat_emission[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; /* Non-emissive */
+        static const GLfloat mat_emission[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; /* Non-emissive */
 
-        glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-        glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT, GL_AMBIENT, p->mat_ambient);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, p->mat_diffuse);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, p->mat_specular);
         glMaterialfv(GL_FRONT, GL_EMISSION, mat_emission);
-        glMaterialf(GL_FRONT, GL_SHININESS, 10.0f);
+        glMaterialf(GL_FRONT, GL_SHININESS, p->mat_shininess);
 
         /* Bind planet texture and draw textured 3D sphere */
         texture_bind(texture_get_planet(i));
@@ -331,3 +396,38 @@ void planets_render(void) {
         glPopMatrix(); /* Restore from planet orbital frame */
     }
 }
+
+void planet_get_material(int index, float ambient[4], float diffuse[4], float specular[4], float *shininess) {
+    if (index < 0 || index >= PLANET_COUNT) {
+        return;
+    }
+    const Planet *p = &planets[index];
+    if (ambient) {
+        for (int j = 0; j < 4; j++) ambient[j] = p->mat_ambient[j];
+    }
+    if (diffuse) {
+        for (int j = 0; j < 4; j++) diffuse[j] = p->mat_diffuse[j];
+    }
+    if (specular) {
+        for (int j = 0; j < 4; j++) specular[j] = p->mat_specular[j];
+    }
+    if (shininess) {
+        *shininess = p->mat_shininess;
+    }
+}
+
+void moon_get_material(float ambient[4], float diffuse[4], float specular[4], float *shininess) {
+    if (ambient) {
+        for (int j = 0; j < 4; j++) ambient[j] = moon_ambient[j];
+    }
+    if (diffuse) {
+        for (int j = 0; j < 4; j++) diffuse[j] = moon_diffuse[j];
+    }
+    if (specular) {
+        for (int j = 0; j < 4; j++) specular[j] = moon_specular[j];
+    }
+    if (shininess) {
+        *shininess = moon_shininess;
+    }
+}
+
