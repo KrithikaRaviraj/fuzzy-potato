@@ -236,7 +236,7 @@ static void keyboard_callback(unsigned char key, int x, int y) {
 int main(int argc, char** argv) {
     printf("====================================================\n");
     printf(" 3D Solar System & Space Exploration Simulator\n");
-    printf(" Week 5: Texture Mapping\n");
+    printf(" Week 6: Lighting & Shading\n");
     printf(" Team: Krithika & Akshatha\n");
     printf(" Developer: Krithika\n");
     printf("====================================================\n");
@@ -248,7 +248,7 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(50, 50);
 
     /* 2. Create window */
-    glutCreateWindow("Solar System Simulator - Week 5: Texture Mapping");
+    glutCreateWindow("Solar System Simulator - Week 6: Lighting & Shading");
 
     /* 3. Initialize OpenGL 3D settings, lighting, and textures */
     init_opengl();

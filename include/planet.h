@@ -24,7 +24,11 @@ typedef struct {
     float orbit_speed;         /* Orbital revolution speed in degrees/second */
     float rotation_angle;      /* Current axial rotation angle in degrees [0, 360) */
     float rotation_speed;      /* Axial rotation speed in degrees/second */
-    float color[3];            /* RGB diffuse color components [0.0f - 1.0f] */
+    float color[3];            /* RGB fallback diffuse color components [0.0f - 1.0f] */
+    float mat_ambient[4];      /* Material ambient reflection coefficients RGBA */
+    float mat_diffuse[4];      /* Material diffuse reflection coefficients RGBA */
+    float mat_specular[4];     /* Material specular reflection coefficients RGBA */
+    float mat_shininess;       /* Material specular exponent [0.0f - 128.0f] */
 } Planet;
 
 /* Total number of standard planets in the simulation */
@@ -69,5 +73,12 @@ float moon_get_orbit_speed(void);
 float moon_get_rotation_angle(void);
 float moon_get_rotation_speed(void);
 
+/*
+ * Material state accessors for inspection and unit testing.
+ */
+void planet_get_material(int index, float ambient[4], float diffuse[4], float specular[4], float *shininess);
+void moon_get_material(float ambient[4], float diffuse[4], float specular[4], float *shininess);
+
 void planet_get_position(int index, float *x, float *y, float *z);
 #endif /* PLANET_H */
+
