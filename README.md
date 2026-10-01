@@ -6,19 +6,24 @@ An interactive, real-time 3D simulation of the Solar System and space exploratio
 
 ## Current Status
 
-**Week 5 - Texture Mapping**
+**Week 6 - Lighting & Shading**
 
-The project introduces photorealistic 2D texture mapping across all celestial bodies while fully preserving all dynamic kinematics, hierarchy, lighting, and camera systems:
-* **All 8 Textured Planets**: Authentic equirectangular photographic surface maps for Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune (sourced from NASA / Solar System Scope).
-* **Luminous Textured Sun**: The Sun is mapped with high-resolution solar photosphere imagery, showcasing surface granulation, flares, sunspots, and natural limb darkening, eliminating the uniform flat-yellow appearance.
-* **Textured Moon**: High-resolution lunar surface map showing craters and lunar maria, orbiting Earth in a multi-level hierarchy.
-* **Starfield Cosmic Background**: Immersive panoramic Milky Way starfield background sphere rendered behind all scene elements.
-* **Spherical UV Mapping**: Reusable parametric 3D sphere generator with analytical surface normals and equirectangular spherical $(u, v)$ coordinates.
-* **Trilinear Mipmapping & Filtering**: Full mipmap pyramid generation via `gluBuild2DMipmaps`, configured with `GL_LINEAR_MIPMAP_LINEAR` minification to eliminate aliasing and moiré shimmering at all distances.
-* **Dynamic Day/Night Lighting Integration**: Fixed-function `GL_LIGHT0` point lighting modulates texture colors (`GL_MODULATE`), dynamically illuminating sunlit hemispheres while casting natural shadows on the night side.
-* **Preserved Dynamic Kinematics**: All Week 4 orbital revolution, axial rotation, Earth-Moon hierarchy, and Saturn ring geometry remain intact.
-* **Strict State Management**: Clean OpenGL state isolation prevents texture bleeding onto non-textured geometry (orbits and Saturn rings).
-* **Robust Resource Management**: Textures load once at initialization into GPU memory, and are freed cleanly on simulator exit.
+The project refines the fixed-function OpenGL illumination and material system to create deep, realistic 3D planetary shading while preserving photorealistic textures, dynamic animations, and camera navigation:
+* **Differentiated Planetary Materials**: Calibrated Phong-style material reflection coefficients (ambient, diffuse, specular, and shininess) for each celestial body:
+  - **Mercury**: Airless, heavily cratered silicate rock (very low specular $0.08$, low shininess $6.0$).
+  - **Venus**: Dense, highly reflective sulfuric acid clouds with high albedo and soft cloud sheen (specular $0.35$, shininess $22.0$).
+  - **Earth**: Distinct oceanic specular glint / sheen across 71% water coverage (high specular $0.50$, focused shininess $38.0$).
+  - **Moon**: Fine silicate regolith with broad matte scattering (specular $0.06$, shininess $4.0$).
+  - **Mars**: Dry, dusty iron-oxide basalt surface with matte reflection (specular $0.12$, shininess $10.0$).
+  - **Jupiter**: Gaseous cloud bands with smooth atmospheric sheen (specular $0.25$, shininess $18.0$).
+  - **Saturn**: Banded atmosphere with soft ammonia haze dispersion (specular $0.22$, shininess $16.0$).
+  - **Uranus & Neptune**: Smooth icy methane atmospheres with crisp aerosol highlights (specular $0.30 - 0.32$, shininess $26.0 - 28.0$).
+* **Clear Day / Night Hemispheres**: The central solar light (`GL_LIGHT0` at origin) dynamically illuminates each planet's inward-facing surface, creating a clearly defined subsolar point, transition terminator, and shaded night side.
+* **Non-Black Night Sides**: Combined `GL_LIGHT_MODEL_AMBIENT` and light ambient terms maintain a subtle baseline ambient illumination ($\sim 0.20$), allowing continents, cloud bands, and planetary surface details to remain visible on the night side.
+* **Local Viewer Specular Accuracy**: Configured `GL_LIGHT_MODEL_LOCAL_VIEWER` to calculate specular reflection vectors from the actual camera/eye position rather than an infinite $+Z$ viewer, ensuring specular highlights react naturally during camera orbits and zooms.
+* **Gouraud Smooth Shading (`GL_SMOOTH`)**: Enabled smooth color interpolation across polygon faces, preventing faceted mesh appearances on spheres.
+* **Preserved Luminous Textured Sun**: The Sun renders self-luminously with photographic photosphere textures, while `GL_LIGHT0` anchored at the origin casts light onto surrounding planets.
+* **Strict State Isolation**: Orbit lines, Saturn rings, and cosmic starfield background remain unlit, preventing lighting or texture bleeding.
 
 ---
 
@@ -85,6 +90,7 @@ fuzzy-potato/
 │   ├── stars.jpg       # Milky Way cosmic starfield map
 │   └── saturn_ring.png # Saturn ring texture profile
 ├── docs/               # Technical guides and Computer Graphics concepts documentation
+│   ├── week6_concepts.md # Comprehensive guide: Phong lighting model, materials, local viewer
 │   ├── week5_concepts.md # Comprehensive guide: UV mapping, mipmaps, texture/light interaction
 │   ├── texture_sources.md # Texture provenance, NASA mission sources, and CC BY 4.0 licenses
 │   ├── week4_concepts.md # Week 4 guide: delta time, kinematics, Moon hierarchy
@@ -113,6 +119,8 @@ fuzzy-potato/
 | `D` / `d` | Move Camera Right (+X) |
 | `Z` / `z` | Zoom In / Decrease Viewing Distance |
 | `X` / `x` | Zoom Out / Increase Viewing Distance |
+| `1` – `8` | Focus Camera on Selected Planet (Mercury to Neptune) |
+| `0`       | Clear Focus and Return to Full Solar System Overview |
 | `R` / `r` | Reset Camera to Default Overview `(0, 16, 28)` |
 | `ESC` / `Q` / `q` | Exit Simulator Cleanly |
 
