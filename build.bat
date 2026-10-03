@@ -15,8 +15,7 @@ if not exist bin (
 )
 
 echo [BUILD] Compiling 3D Solar System Simulator (Week 6: Lighting and Shading)...
-gcc -Wall -Wextra -std=c99 src\main.c src\camera.c src\sphere.c src\lighting.c src\sun.c src\planet.c src\orbit.c src\texture.c -Iinclude -o bin\solar_sim.exe -lfreeglut -lopengl32 -lglu32
-
+gcc -Wall -Wextra -std=c99 src\main.c src\camera.c src\sphere.c src\lighting.c src\sun.c src\planet.c src\orbit.c src\texture.c src\ui.c -Iinclude -o bin\solar_sim.exe -lfreeglut -lopengl32 -lglu32
 if %ERRORLEVEL% equ 0 (
     echo [BUILD] Build successful! Binary: bin\solar_sim.exe
 ) else (
