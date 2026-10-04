@@ -39,6 +39,7 @@
 #include "planet.h"
 #include "orbit.h"
 #include "texture.h"
+#include "ui.h"
 
 /* Window dimensions */
 static int window_width = 1024;
@@ -180,7 +181,9 @@ static void display_callback(void) {
      */
     planets_render();
 
-    /* Swap front and back buffers */
+/* Week 7: Planet information UI */
+    ui_render_planet_info();
+
     glutSwapBuffers();
 }
 
@@ -253,6 +256,7 @@ int main(int argc, char** argv) {
     /* 3. Initialize OpenGL 3D settings, lighting, and textures */
     init_opengl();
     camera_init();
+    ui_init();
 
     /* 4. Register FreeGLUT callbacks */
     glutDisplayFunc(display_callback);

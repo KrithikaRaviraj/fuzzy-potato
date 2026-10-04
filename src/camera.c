@@ -288,3 +288,8 @@ void camera_clear_focus(void)
 
     camera_reset();
 }
+/* Return the currently focused planet index */
+int camera_get_focused_planet(void)
+{
+    return focused_planet;
+}

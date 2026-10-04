@@ -18,4 +18,6 @@ void camera_focus_planet(int index);
 
 /* Return camera to the full Solar System view */
 void camera_clear_focus(void);
+/* Return the currently focused planet index */
+int camera_get_focused_planet(void);
 #endif
